@@ -5,15 +5,31 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:trip_script_admin/consts/custom_snackbar.dart';
 import 'package:trip_script_admin/db/pick_image.dart';
 
+const List<String> region = <String>[
+  'Ashanti',
+  'Bono',
+  'Bono East',
+  'Ahafo',
+  'Central',
+  'Eastern',
+  'Greater Accra',
+  'Northern',
+  'Savannah',
+  'North East',
+  'Upper East',
+  'Upper West',
+  'Volta',
+  'Oti',
+  'Western',
+  'Western North',
+];
 
-const List<String> region = <String>['Ashanti',  'Bono',  'Bono East',  'Ahafo',  'Central',  'Eastern',  'Greater Accra',  'Northern',  'Savannah',  'North East',  'Upper East',  'Upper West',  'Volta',  'Oti',  'Western',  'Western North',];
 class AddNewLocation extends StatefulWidget {
   const AddNewLocation({super.key});
 
   @override
   State<AddNewLocation> createState() => _AddNewLocationState();
 }
-
 
 class _AddNewLocationState extends State<AddNewLocation> {
   bool isPicked1 = false;
@@ -33,6 +49,57 @@ class _AddNewLocationState extends State<AddNewLocation> {
   final TextEditingController websiteController = TextEditingController();
   final formKey = GlobalKey<FormState>();
   String? selectedRegion;
+
+  List<String> selectedDays = [];
+  final List<String> days = [
+    'Monday',
+    'Tuesday',
+    'Wednesday',
+    'Thursday',
+    'Friday',
+    'Saturday',
+    'Sunday',
+  ];
+
+  TimeOfDay? openingTime;
+  TimeOfDay? closingTime;
+
+  void _onDaySelected(String day, bool isSelected) {
+    setState(() {
+      if (isSelected) {
+        selectedDays.add(day);
+      } else {
+        selectedDays.remove(day);
+      }
+    });
+  }
+
+  Future<void> _selectOpeningTime() async {
+    final TimeOfDay? pickedTime = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+    );
+
+    if (pickedTime != null) {
+      setState(() {
+        openingTime = pickedTime;
+      });
+    }
+  }
+
+  Future<void> _selectClosingTime() async {
+    final TimeOfDay? pickedTime = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+    );
+
+    if (pickedTime != null) {
+      setState(() {
+        closingTime = pickedTime;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -249,8 +316,78 @@ class _AddNewLocationState extends State<AddNewLocation> {
                   maxLines: 1,
                 ),
                 SizedBox(height: 20.h),
-                //create a checklist for the operating days and save the selected days as a list
-                //create two text fields with time pickers. one for the opening time and another for the closing time
+
+                // Checklist for operating days
+                Text(
+                  'Operating Days',
+                  style: TextStyle(
+                    fontSize: 16.sp,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                Wrap(
+                  spacing: 8.0,
+                  children: days.map((day) {
+                    return FilterChip(
+                      label: Text(day),
+                      selected: selectedDays.contains(day),
+                      onSelected: (isSelected) =>
+                          _onDaySelected(day, isSelected),
+                    );
+                  }).toList(),
+                ),
+
+                SizedBox(height: 20.h),
+
+                // Opening Time
+                Row(
+                  children: [
+                    Expanded(
+                      child: CustomTextField(
+                        controller: TextEditingController(
+                          text: openingTime != null
+                              ? openingTime!.format(context)
+                              : '',
+                        ),
+                        title: 'Opening Time',
+                        keyboardType: TextInputType.text,
+                        maxLines: 1,
+                        enabled: false,
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: _selectOpeningTime,
+                      icon: Icon(Icons.access_time),
+                    ),
+                  ],
+                ),
+
+                SizedBox(height: 20.h),
+
+                // Closing Time
+                Row(
+                  children: [
+                    Expanded(
+                      child: CustomTextField(
+                        controller: TextEditingController(
+                          text: closingTime != null
+                              ? closingTime!.format(context)
+                              : '',
+                        ),
+                        title: 'Closing Time',
+                        keyboardType: TextInputType.text,
+                        maxLines: 1,
+                        enabled: false,
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: _selectClosingTime,
+                      icon: Icon(Icons.access_time),
+                    ),
+                  ],
+                ),
+
+                SizedBox(height: 20.h),
                 CustomTextField(
                   controller: descriptionController,
                   title: 'Description',
@@ -269,6 +406,29 @@ class _AddNewLocationState extends State<AddNewLocation> {
           ),
 
           //create a button to submit a new location objet with all the inputted information
+          Padding(
+            padding: EdgeInsets.symmetric(vertical: 20.h),
+            child: ElevatedButton(
+              onPressed: () {
+                // ... (your form validation and data handling logic) ...
+              },
+              style: ElevatedButton.styleFrom(
+                fixedSize: Size(300.w, 60.h),
+                elevation: 0,
+                backgroundColor: Colors.blue,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10.r),
+                ),
+              ),
+              child: Text(
+                'Add new location',
+                style: TextStyle(
+                  fontSize: 20.sp,
+                ),
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -282,12 +442,14 @@ class CustomTextField extends StatelessWidget {
     required this.title,
     required this.keyboardType,
     required this.maxLines,
+    this.enabled = true,
   });
 
   final TextEditingController controller;
   final String title;
   final TextInputType keyboardType;
   final int maxLines;
+  final bool enabled;
 
   @override
   Widget build(BuildContext context) {
@@ -310,6 +472,7 @@ class CustomTextField extends StatelessWidget {
             fontSize: 20.sp,
           ),
           maxLines: maxLines,
+          enabled: enabled, // Use the enabled property here
           decoration: InputDecoration(
             hintText: title,
             hintStyle: TextStyle(
@@ -329,6 +492,7 @@ class CustomTextField extends StatelessWidget {
     );
   }
 }
+
 class CustomDropdown extends StatelessWidget {
   const CustomDropdown({
     super.key,
@@ -336,12 +500,11 @@ class CustomDropdown extends StatelessWidget {
     required this.items,
     required this.selectedValue,
     required this.onChanged,
-});
+  });
   final String title;
   final List<String> items;
   final String? selectedValue;
   final void Function(String?) onChanged;
-
 
   @override
   Widget build(BuildContext context) {
