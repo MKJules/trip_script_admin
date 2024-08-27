@@ -249,6 +249,8 @@ class _AddNewLocationState extends State<AddNewLocation> {
                   maxLines: 1,
                 ),
                 SizedBox(height: 20.h),
+                //create a checklist for the operating days and save the selected days as a list
+                //create two text fields with time pickers. one for the opening time and another for the closing time
                 CustomTextField(
                   controller: descriptionController,
                   title: 'Description',
@@ -265,6 +267,8 @@ class _AddNewLocationState extends State<AddNewLocation> {
               ],
             ),
           ),
+
+          //create a button to submit a new location objet with all the inputted information
         ],
       ),
     );
