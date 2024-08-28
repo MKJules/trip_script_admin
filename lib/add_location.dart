@@ -299,8 +299,6 @@ class _AddNewLocationState extends State<AddNewLocation> {
                   maxLines: 1,
                 ),
                 SizedBox(height: 20.h),
-
-                //regionS
                 CustomDropdown(
                   title: 'Region',
                   items: region,
@@ -345,10 +343,7 @@ class _AddNewLocationState extends State<AddNewLocation> {
                     );
                   }).toList(),
                 ),
-
                 SizedBox(height: 20.h),
-
-                // Opening Time
                 Row(
                   children: [
                     Expanded(
@@ -366,14 +361,11 @@ class _AddNewLocationState extends State<AddNewLocation> {
                     ),
                     IconButton(
                       onPressed: _selectOpeningTime,
-                      icon: Icon(Icons.access_time),
+                      icon: const Icon(Icons.access_time),
                     ),
                   ],
                 ),
-
                 SizedBox(height: 20.h),
-
-                // Closing Time
                 Row(
                   children: [
                     Expanded(
@@ -391,11 +383,10 @@ class _AddNewLocationState extends State<AddNewLocation> {
                     ),
                     IconButton(
                       onPressed: _selectClosingTime,
-                      icon: Icon(Icons.access_time),
+                      icon: const Icon(Icons.access_time),
                     ),
                   ],
                 ),
-
                 SizedBox(height: 20.h),
                 CustomTextField(
                   controller: descriptionController,
@@ -447,8 +438,8 @@ class _AddNewLocationState extends State<AddNewLocation> {
                       DateTime.now().year,
                       DateTime.now().month,
                       DateTime.now().day,
-                      openingTime!.hour,
-                      openingTime!.minute,
+                      closingTime!.hour,
+                      closingTime!.minute,
                     ),
                     description: description,
                     websiteLink: websiteLink,
