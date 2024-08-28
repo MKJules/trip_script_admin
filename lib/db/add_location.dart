@@ -16,7 +16,7 @@ Future<void> addNewLocation(Location newLocation) async {
       'category': newLocation.category,
       'operatingDays': newLocation.operatingDays,
       'openingTime': newLocation.openingTime,
-      'closingTime': newLocation.closingTime,
+      'closingTime': Timestamp.fromDate(newLocation.closingTime),
       'description': newLocation.description,
       'websiteLink': newLocation.websiteLink,
     });

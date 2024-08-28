@@ -3,7 +3,10 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:trip_script_admin/consts/custom_snackbar.dart';
+import 'package:trip_script_admin/db/add_location.dart';
 import 'package:trip_script_admin/db/pick_image.dart';
+import 'package:trip_script_admin/models/location.dart';
+import 'package:uuid/uuid.dart';
 
 const List<String> region = <String>[
   'Ashanti',
@@ -131,8 +134,11 @@ class _AddNewLocationState extends State<AddNewLocation> {
                   log('Please select an image');
                   showCustomSnackBar('Please select an image', context);
                 } else {
-                  images.add(imagePath);
-                  isPicked1 = true;
+                  setState(() {
+                    images.add(imagePath);
+                    isPicked1 = true;
+                  });
+                  print('Image picked');
                 }
               },
               child: isPicked1
@@ -172,6 +178,7 @@ class _AddNewLocationState extends State<AddNewLocation> {
                         images.add(imagePath);
                         isPicked2 = true;
                       });
+                      print('Image picked');
                     }
                   },
                   child: isPicked2
@@ -230,7 +237,7 @@ class _AddNewLocationState extends State<AddNewLocation> {
                   },
                   child: isPicked4
                       ? Image.network(
-                          images[4],
+                          images[3],
                           width: 100.w,
                           height: 100.h,
                           fit: BoxFit.fill,
@@ -249,13 +256,16 @@ class _AddNewLocationState extends State<AddNewLocation> {
                       log('Please select an image');
                       showCustomSnackBar('Please select an image', context);
                     } else {
-                      images.add(imagePath);
-                      isPicked5 = true;
+                      setState(() {
+                        images.add(imagePath);
+                        isPicked5 = true;
+                      });
+                      print('Image picked');
                     }
                   },
                   child: isPicked5
                       ? Image.network(
-                          images[5],
+                          images[4],
                           width: 200.w,
                           height: 200.h,
                           fit: BoxFit.fill,
@@ -317,7 +327,6 @@ class _AddNewLocationState extends State<AddNewLocation> {
                 ),
                 SizedBox(height: 20.h),
 
-                // Checklist for operating days
                 Text(
                   'Operating Days',
                   style: TextStyle(
@@ -404,13 +413,54 @@ class _AddNewLocationState extends State<AddNewLocation> {
               ],
             ),
           ),
-
-          //create a button to submit a new location objet with all the inputted information
           Padding(
             padding: EdgeInsets.symmetric(vertical: 20.h),
             child: ElevatedButton(
               onPressed: () {
-                // ... (your form validation and data handling logic) ...
+                try {
+                  if (formKey.currentState!.validate()) {}
+                  String id = const Uuid().v4();
+                  String name = nameController.text;
+                  String city = cityController.text;
+                  double rating = double.parse(ratingController.text);
+                  String category = categoryController.text;
+                  String description = descriptionController.text;
+                  String websiteLink = websiteController.text;
+
+                  Location newLocation = Location(
+                    id: id,
+                    name: name,
+                    city: city,
+                    region: selectedRegion ?? '',
+                    images: images,
+                    rating: rating,
+                    category: category,
+                    operatingDays: selectedDays,
+                    openingTime: DateTime(
+                      DateTime.now().year,
+                      DateTime.now().month,
+                      DateTime.now().day,
+                      openingTime!.hour,
+                      openingTime!.minute,
+                    ),
+                    closingTime: DateTime(
+                      DateTime.now().year,
+                      DateTime.now().month,
+                      DateTime.now().day,
+                      openingTime!.hour,
+                      openingTime!.minute,
+                    ),
+                    description: description,
+                    websiteLink: websiteLink,
+                  );
+
+                  addNewLocation(newLocation);
+                  showCustomSnackBar('Location added successfully', context);
+                  Navigator.pop(context);
+                } catch (error) {
+                  log('Error: $error');
+                  showCustomSnackBar('Error: $error', context);
+                }
               },
               style: ElevatedButton.styleFrom(
                 fixedSize: Size(300.w, 60.h),
